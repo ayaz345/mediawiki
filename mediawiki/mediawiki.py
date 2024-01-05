@@ -184,10 +184,7 @@ class MediaWiki(object):
     @proxies.setter
     def proxies(self, proxies):
         """ Turn on, off, or set proxy use through the Requests library """
-        if proxies and isinstance(proxies, dict):
-            self._proxies = proxies
-        else:
-            self._proxies = None
+        self._proxies = proxies if proxies and isinstance(proxies, dict) else None
         self._reset_session()
 
     @property
@@ -240,9 +237,7 @@ class MediaWiki(object):
     @verify_ssl.setter
     def verify_ssl(self, verify_ssl):
         """ Set request verify SSL parameter; defaults to True if issue """
-        self._verify_ssl = True
-        if isinstance(verify_ssl, (bool, str)):
-            self._verify_ssl = verify_ssl
+        self._verify_ssl = verify_ssl if isinstance(verify_ssl, (bool, str)) else True
         self._reset_session()
 
     @property
@@ -372,9 +367,9 @@ class MediaWiki(object):
             self._is_logged_in = True
             return True
         self._is_logged_in = False
-        reason = res["login"]["reason"]
         if strict:
-            msg = "MediaWiki login failure: {}".format(reason)
+            reason = res["login"]["reason"]
+            msg = f"MediaWiki login failure: {reason}"
             raise MediaWikiLoginError(msg)
         return False
 
@@ -480,9 +475,7 @@ class MediaWiki(object):
         request = self.wiki_request(query_params)
         titles = [page["title"] for page in request["query"]["random"]]
 
-        if len(titles) == 1:
-            return titles[0]
-        return titles
+        return titles[0] if len(titles) == 1 else titles
 
     @memoize
     def allpages(self, query="", results=10):
@@ -504,8 +497,7 @@ class MediaWiki(object):
 
         self._check_error_response(request, query)
 
-        titles = [page["title"] for page in request["query"]["allpages"]]
-        return titles
+        return [page["title"] for page in request["query"]["allpages"]]
 
     @memoize
     def search(self, query, results=10, suggestion=False):
@@ -655,10 +647,10 @@ class MediaWiki(object):
 
         self._check_error_response(results, query)
 
-        res = list()
-        for i, item in enumerate(results[1]):
-            res.append((item, results[2][i], results[3][i]))
-        return res
+        return [
+            (item, results[2][i], results[3][i])
+            for i, item in enumerate(results[1])
+        ]
 
     @memoize
     def prefixsearch(self, prefix, results=10):
@@ -737,8 +729,8 @@ class MediaWiki(object):
             "cmlimit": (min(results, max_pull) if results is not None else max_pull),
             "cmtitle": "{0}:{1}".format(self.category_prefix, category),
         }
-        pages = list()
-        subcats = list()
+        pages = []
+        subcats = []
         returned_results = 0
         finished = False
         last_cont = dict()
@@ -778,9 +770,7 @@ class MediaWiki(object):
                 search_params["cmlimit"] = results - returned_results
         # end while loop
 
-        if subcategories:
-            return pages, subcats
-        return pages
+        return (pages, subcats) if subcategories else pages
 
     def categorytree(self, category, depth=5):
         """ Generate the Category Tree for the given categories
@@ -904,9 +894,9 @@ class MediaWiki(object):
         if tmp.startswith("http://") or tmp.startswith("https://"):
             self._base_url = tmp
         elif gen["base"].startswith("https:"):
-            self._base_url = "https:{}".format(tmp)
+            self._base_url = f"https:{tmp}"
         else:
-            self._base_url = "http:{}".format(tmp)
+            self._base_url = f"http:{tmp}"
 
         self._extensions = [ext["name"] for ext in query["extensions"]]
         self._extensions = sorted(list(set(self._extensions)))
@@ -940,11 +930,7 @@ class MediaWiki(object):
     def __category_parameter_verification(cats, depth, category):
         # parameter verification
         if len(cats) == 1 and (cats[0] is None or cats[0] == ""):
-            msg = (
-                "CategoryTree: Parameter 'category' must either "
-                "be a list of one or more categories or a string; "
-                "provided: '{}'".format(category)
-            )
+            msg = f"CategoryTree: Parameter 'category' must either be a list of one or more categories or a string; provided: '{category}'"
             raise ValueError(msg)
 
         if depth is not None and depth < 1:
@@ -956,9 +942,9 @@ class MediaWiki(object):
         tree[cat] = dict()
         tree[cat]["depth"] = level
         tree[cat]["sub-categories"] = dict()
-        tree[cat]["links"] = list()
-        tree[cat]["parent-categories"] = list()
-        parent_cats = list()
+        tree[cat]["links"] = []
+        tree[cat]["parent-categories"] = []
+        parent_cats = []
 
         if cat not in categories:
             tries = 0
