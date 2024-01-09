@@ -45,7 +45,7 @@ def memoize(func):
         defaults = cache["defaults"][func.__name__].copy()
         for key, val in kwargs.items():
             defaults[key] = val
-        tmp = list()
+        tmp = []
         tmp.extend(args[1:])
         for k in sorted(defaults.keys()):
             tmp.append("({0}: {1})".format(k, defaults[k]))
@@ -76,7 +76,4 @@ def is_relative_url(url):
     """ simple method to determine if a url is relative or absolute """
     if url.startswith("#"):
         return None
-    if url.find("://") > 0 or url.startswith("//"):
-        # either 'http(s)://...' or '//cdn...' and therefore absolute
-        return False
-    return True
+    return url.find("://") <= 0 and not url.startswith("//")

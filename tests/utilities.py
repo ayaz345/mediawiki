@@ -13,9 +13,7 @@ class FunctionUseCounter(object):
     def __call__(self, *args, **kwargs):
         ''' what to do when called '''
         self.count += 1
-        if self.count > 50:  # arbitrary large
-            return dict()
-        return self.func(*args, **kwargs)
+        return dict() if self.count > 50 else self.func(*args, **kwargs)
 
 
 def find_depth(node):
@@ -31,10 +29,10 @@ def find_depth(node):
 
         if len(next_node['sub-categories'].keys()) == 0:
             return next_node['depth']
-        else:
-            for key in next_node['sub-categories'].keys():
-                path_depth = walk(next_node['sub-categories'][key], depth)
-                if path_depth and path_depth > depth:
-                    depth = path_depth
-            return depth
+        for key in next_node['sub-categories'].keys():
+            path_depth = walk(next_node['sub-categories'][key], depth)
+            if path_depth and path_depth > depth:
+                depth = path_depth
+        return depth
+
     return walk(node, 0)

@@ -1152,7 +1152,7 @@ class TestMediaWikiPage(unittest.TestCase):
                     _flatten_toc(val, res)
 
         toc = self.pag.table_of_contents
-        toc_ord = list()
+        toc_ord = []
         _flatten_toc(toc, toc_ord)
         self.assertEqual(toc_ord, self.response['arya']['sections'])
 
@@ -1288,11 +1288,12 @@ class TestMediaWikiPage(unittest.TestCase):
                 res.append(key)
                 if val.keys():
                     _flatten_toc(val, res)
+
         wiki = MediaWikiOverloaded()
         response = wiki.responses[wiki.api_url]
         pg = wiki.page('New York City')
         toc = pg.table_of_contents
-        toc_ord = list()
+        toc_ord = []
         _flatten_toc(toc, toc_ord)
         self.assertEqual(toc_ord, response['new_york_city_sections'])
 
@@ -1381,9 +1382,7 @@ class TestMediaWikiCategoryTree(unittest.TestCase):
         try:
             site.categorytree(category, depth=None)
         except ValueError as ex:
-            msg = ("CategoryTree: Parameter 'category' must either "
-                   "be a list of one or more categories or a string; "
-                   "provided: '{}'".format(category))
+            msg = f"CategoryTree: Parameter 'category' must either be a list of one or more categories or a string; provided: '{category}'"
             self.assertEqual(str(ex), msg)
 
     def test_category_tree_valerror_2(self):
@@ -1399,9 +1398,7 @@ class TestMediaWikiCategoryTree(unittest.TestCase):
         try:
             site.categorytree(category, depth=None)
         except ValueError as ex:
-            msg = ("CategoryTree: Parameter 'category' must either "
-                   "be a list of one or more categories or a string; "
-                   "provided: '{}'".format(category))
+            msg = f"CategoryTree: Parameter 'category' must either be a list of one or more categories or a string; provided: '{category}'"
             self.assertEqual(str(ex), msg)
 
     def test_category_tree_valerror_3(self):
@@ -1522,7 +1519,7 @@ class TestMediaWikiLogos(unittest.TestCase):
         ''' test when no infobox (based on the class name) is found '''
         site = MediaWikiOverloaded()
         page = site.page('Antivirus Software')
-        self.assertEqual(page.logos, list())  # should be an empty list
+        self.assertEqual(page.logos, [])
 
 
 class TestMediaWikiPreview(unittest.TestCase):
@@ -1605,7 +1602,7 @@ class TestMediaWikiParseSectionLinks(unittest.TestCase):
             links = pg.parse_section_links(section)
             for i, item in enumerate(links):
                 links[i] = list(item)
-            self.assertEqual(links, res['arya_{}_links'.format(section)])
+            self.assertEqual(links, res[f'arya_{section}_links'])
 
 
 class TestMediaWikiRegressions(unittest.TestCase):

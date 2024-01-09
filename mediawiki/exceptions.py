@@ -230,12 +230,7 @@ class MediaWikiCategoryTreeError(MediaWikiBaseException):
 
     def __init__(self, category):
         self._category = category
-        msg = (
-            "Categorytree threw an exception for trying to get the "
-            "same category '{}' too many times. Please try again later "
-            "and perhaps use the rate limiting "
-            "option."
-        ).format(self._category)
+        msg = f"Categorytree threw an exception for trying to get the same category '{self._category}' too many times. Please try again later and perhaps use the rate limiting option."
         super(MediaWikiCategoryTreeError, self).__init__(msg)
 
     @property
